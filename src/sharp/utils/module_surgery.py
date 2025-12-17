@@ -10,7 +10,9 @@ from typing import Any
 
 from torch import nn
 
-NORM_LAYER_TYPES = tuple(module_type for name, module_type in nn.__dict__.items() if "Norm" in name)
+NORM_LAYER_TYPES = tuple(
+    module_type for name, module_type in nn.__dict__.items() if "Norm" in name
+)
 BATCH_NORM_LAYER_TYPES = tuple(
     module_type for name, module_type in nn.__dict__.items() if "BatchNorm" in name
 )

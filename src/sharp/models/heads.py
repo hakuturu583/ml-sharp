@@ -45,9 +45,15 @@ class DirectPredictionHead(nn.Module):
         Returns:
             The predicted deltas for Gaussian attributes.
         """
-        delta_values_geometry = self.geometry_prediction_head(image_features.geometry_features)
-        delta_values_texture = self.texture_prediction_head(image_features.texture_features)
+        delta_values_geometry = self.geometry_prediction_head(
+            image_features.geometry_features
+        )
+        delta_values_texture = self.texture_prediction_head(
+            image_features.texture_features
+        )
         delta_values_geometry = delta_values_geometry.unflatten(1, (3, self.num_layers))
-        delta_values_texture = delta_values_texture.unflatten(1, (14 - 3, self.num_layers))
+        delta_values_texture = delta_values_texture.unflatten(
+            1, (14 - 3, self.num_layers)
+        )
         delta_values = torch.cat([delta_values_geometry, delta_values_texture], dim=1)
         return delta_values

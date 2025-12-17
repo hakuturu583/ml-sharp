@@ -189,16 +189,22 @@ class SlidingPyramidNetwork(BaseEncoder):
         # This fuser affects both image and patch encoders.
         self.fuse_lowres.requires_grad_(image_encoder or patch_encoder)
 
-    def _create_pyramid(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def _create_pyramid(
+        self, x: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Creates a 3-level image pyramid."""
         # Original resolution: 1536 by default.
         x0 = x
 
         # Middle resolution: 768 by default.
-        x1 = F.interpolate(x, size=None, scale_factor=0.5, mode="bilinear", align_corners=False)
+        x1 = F.interpolate(
+            x, size=None, scale_factor=0.5, mode="bilinear", align_corners=False
+        )
 
         # Low resolution: 384 by default, corresponding to the backbone resolution.
-        x2 = F.interpolate(x, size=None, scale_factor=0.25, mode="bilinear", align_corners=False)
+        x2 = F.interpolate(
+            x, size=None, scale_factor=0.25, mode="bilinear", align_corners=False
+        )
 
         return x0, x1, x2
 
@@ -246,13 +252,17 @@ class SlidingPyramidNetwork(BaseEncoder):
         # be preserved during graph transformation, leading to unexpected behavior.
         # To avoid such issues it is safer not to use them because they are not
         # essential here.
-        x_pyramid_encodings, patch_intermediate_features = self.patch_encoder(x_pyramid_patches)
+        x_pyramid_encodings, patch_intermediate_features = self.patch_encoder(
+            x_pyramid_patches
+        )
 
         # Step 3: merging.
         # Merge highres latent encoding.
         # NOTE: list type check has completed in init.
         x_latent0_encodings = self.patch_encoder.reshape_feature(
-            patch_intermediate_features[self.patch_intermediate_features_ids[0]]  # type:ignore[index]
+            patch_intermediate_features[
+                self.patch_intermediate_features_ids[0]
+            ]  # type:ignore[index]
         )
         x_latent0_features = merge(
             x_latent0_encodings[: batch_size * x0_tile_size],
@@ -261,7 +271,9 @@ class SlidingPyramidNetwork(BaseEncoder):
         )
 
         x_latent1_encodings = self.patch_encoder.reshape_feature(
-            patch_intermediate_features[self.patch_intermediate_features_ids[1]]  # type:ignore[index]
+            patch_intermediate_features[
+                self.patch_intermediate_features_ids[1]
+            ]  # type:ignore[index]
         )
         x_latent1_features = merge(
             x_latent1_encodings[: batch_size * x0_tile_size],
@@ -289,14 +301,20 @@ class SlidingPyramidNetwork(BaseEncoder):
         x_lowres_features, image_intermediate_features = self.image_encoder(x2_patches)
 
         # Upsample feature maps.
-        x_latent0_features = checkpoint_wrapper(self, self.upsample_latent0, x_latent0_features)
-        x_latent1_features = checkpoint_wrapper(self, self.upsample_latent1, x_latent1_features)
+        x_latent0_features = checkpoint_wrapper(
+            self, self.upsample_latent0, x_latent0_features
+        )
+        x_latent1_features = checkpoint_wrapper(
+            self, self.upsample_latent1, x_latent1_features
+        )
 
         x0_features = checkpoint_wrapper(self, self.upsample0, x0_features)
         x1_features = checkpoint_wrapper(self, self.upsample1, x1_features)
         x2_features = checkpoint_wrapper(self, self.upsample2, x2_features)
 
-        x_lowres_features = checkpoint_wrapper(self, self.upsample_lowres, x_lowres_features)
+        x_lowres_features = checkpoint_wrapper(
+            self, self.upsample_lowres, x_lowres_features
+        )
         x_lowres_features = checkpoint_wrapper(
             self, self.fuse_lowres, torch.cat((x2_features, x_lowres_features), dim=1)
         )
@@ -316,7 +334,9 @@ class SlidingPyramidNetwork(BaseEncoder):
 # Hence, split and merge were converted into functions to be marked as atomic
 # operations for symbolic tracing.
 @torch.fx.wrap
-def split(image: torch.Tensor, overlap_ratio: float = 0.25, patch_size: int = 384) -> torch.Tensor:
+def split(
+    image: torch.Tensor, overlap_ratio: float = 0.25, patch_size: int = 384
+) -> torch.Tensor:
     """Split the input into small patches with sliding window."""
     patch_stride = int(patch_size * (1 - overlap_ratio))
 
@@ -338,7 +358,9 @@ def split(image: torch.Tensor, overlap_ratio: float = 0.25, patch_size: int = 38
 
 # Decorator marking function as an atomic operator for symbolic tracing.
 @torch.fx.wrap
-def merge(image_patches: torch.Tensor, batch_size: int, padding: int = 3) -> torch.Tensor:
+def merge(
+    image_patches: torch.Tensor, batch_size: int, padding: int = 3
+) -> torch.Tensor:
     """Merge the patched input into a image with sliding window."""
     steps = int(math.sqrt(image_patches.shape[0] // batch_size))
 

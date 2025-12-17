@@ -56,7 +56,9 @@ class MonodepthDensePredictionTransformer(nn.Module):
 
         dim_decoder = decoder.dim_out
         self.head = nn.Sequential(
-            nn.Conv2d(dim_decoder, dim_decoder // 2, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(
+                dim_decoder, dim_decoder // 2, kernel_size=3, stride=1, padding=1
+            ),
             nn.ConvTranspose2d(
                 in_channels=dim_decoder // 2,
                 out_channels=dim_decoder // 2,
@@ -209,7 +211,9 @@ class MonodepthWithEncodingAdaptor(nn.Module):
         if self.num_monodepth_layers == 2 and self.sorting_monodepth:
             first_layer_disparity = disparity.max(dim=1, keepdims=True).values
             second_layer_disparity = disparity.min(dim=1, keepdims=True).values
-            disparity = torch.cat([first_layer_disparity, second_layer_disparity], dim=1)
+            disparity = torch.cat(
+                [first_layer_disparity, second_layer_disparity], dim=1
+            )
 
         output_features = []
         if self.return_encoder_features:
@@ -248,7 +252,9 @@ class MonodepthWithEncodingAdaptor(nn.Module):
         self.monodepth_predictor.head[4].weight = nn.Parameter(
             conv_last.weight.repeat(num_repeat, 1, 1, 1)
         )
-        self.monodepth_predictor.head[4].bias = nn.Parameter(conv_last.bias.repeat(num_repeat))
+        self.monodepth_predictor.head[4].bias = nn.Parameter(
+            conv_last.bias.repeat(num_repeat)
+        )
 
 
 def create_monodepth_adaptor(

@@ -46,7 +46,9 @@ class MultiresConvDecoder(BaseDecoder):
             self.dims_decoder = list(dims_decoder)
 
         if len(self.dims_decoder) != len(self.dims_encoder):
-            raise ValueError("Received dims_encoder and dims_decoder of different sizes.")
+            raise ValueError(
+                "Received dims_encoder and dims_decoder of different sizes."
+            )
 
         self.dim_out = self.dims_decoder[0]
 
@@ -56,7 +58,9 @@ class MultiresConvDecoder(BaseDecoder):
         # when the dimensions mismatch. Otherwise we do not do anything, which is
         # the default behavior of monodepth.
         conv0 = (
-            nn.Conv2d(self.dims_encoder[0], self.dims_decoder[0], kernel_size=1, bias=False)
+            nn.Conv2d(
+                self.dims_encoder[0], self.dims_decoder[0], kernel_size=1, bias=False
+            )
             if self.dims_encoder[0] != self.dims_decoder[0]
             else nn.Identity()
         )

@@ -165,7 +165,9 @@ class PredictorParams:
     """Parameters for predictors with default values."""
 
     # Parameters for submodules.
-    initializer: InitializerParams = dataclasses.field(default_factory=InitializerParams)
+    initializer: InitializerParams = dataclasses.field(
+        default_factory=InitializerParams
+    )
     monodepth: MonodepthParams = dataclasses.field(default_factory=MonodepthParams)
     monodepth_adaptor: MonodepthAdaptorParams = dataclasses.field(
         default_factory=MonodepthAdaptorParams
@@ -174,7 +176,9 @@ class PredictorParams:
         default_factory=GaussianDecoderParams
     )
     # How to align depth map (only relevant for RGBGaussianPredictor).
-    depth_alignment: AlignmentParams = dataclasses.field(default_factory=AlignmentParams)
+    depth_alignment: AlignmentParams = dataclasses.field(
+        default_factory=AlignmentParams
+    )
 
     # Selectively reduce learning rate for different properties.
     delta_factor: DeltaFactor = dataclasses.field(default_factory=DeltaFactor)

@@ -9,7 +9,9 @@ from __future__ import annotations
 import dataclasses
 from typing import Literal
 
-ViTPreset = Literal["dinov2l16_384",]
+ViTPreset = Literal[
+    "dinov2l16_384",
+]
 
 MLPMode = Literal["vanilla", "glu"]
 

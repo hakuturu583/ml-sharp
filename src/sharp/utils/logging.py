@@ -11,7 +11,9 @@ import sys
 from pathlib import Path
 
 
-def configure(log_level: int, log_path: Path | None = None, prefix: str | None = None) -> None:
+def configure(
+    log_level: int, log_path: Path | None = None, prefix: str | None = None
+) -> None:
     """Configure logger globally.
 
     Args:

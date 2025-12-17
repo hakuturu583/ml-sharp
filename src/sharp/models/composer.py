@@ -18,7 +18,9 @@ from sharp.utils.gaussians import Gaussians3D
 from .params import DeltaFactor
 
 
-def _get_scale_activation_constant(max_scale: float, min_scale: float) -> tuple[float, float]:
+def _get_scale_activation_constant(
+    max_scale: float, min_scale: float
+) -> tuple[float, float]:
     """Return constants for scale activation function."""
     # To ensure for delta = 0, the value of scale_factor is 1 and the gradient is 1.
     constant_a = (max_scale - min_scale) / (1 - min_scale) / (max_scale - 1)
@@ -84,7 +86,9 @@ class GaussianComposer(nn.Module):
         new_height = image_height * scale_factor
         new_width = image_width * scale_factor
         upsampled_delta = F.interpolate(
-            delta.view(batch_size, num_channels * num_layers, image_height, image_width),
+            delta.view(
+                batch_size, num_channels * num_layers, image_height, image_width
+            ),
             scale_factor=scale_factor,
         ).view(batch_size, num_channels, num_layers, new_height, new_width)
         return upsampled_delta
@@ -118,7 +122,11 @@ class GaussianComposer(nn.Module):
 
         # Account for the change in base scale due to z offsets.
         base_scales = (
-            (base_values.scales * base_values.mean_inverse_z_ndc * mean_vectors[:, 2:3, ...])
+            (
+                base_values.scales
+                * base_values.mean_inverse_z_ndc
+                * mean_vectors[:, 2:3, ...]
+            )
             if self.base_scale_on_predicted_mean
             else base_values.scales
         )
@@ -128,7 +136,9 @@ class GaussianComposer(nn.Module):
             self.min_scale,
             self.max_scale,
         )
-        quaternions = self._quaternion_activation(base_values.quaternions, delta[:, 6:10])
+        quaternions = self._quaternion_activation(
+            base_values.quaternions, delta[:, 6:10]
+        )
         colors = self._color_activation(base_values.colors, delta[:, 10:13])
         opacities = self._opacity_activation(base_values.opacities, delta[:, 13])
 
@@ -154,7 +164,9 @@ class GaussianComposer(nn.Module):
             opacities=opacities,
         )
 
-    def _forward_mean(self, base_values: GaussianBaseValues, delta: torch.Tensor) -> torch.Tensor:
+    def _forward_mean(
+        self, base_values: GaussianBaseValues, delta: torch.Tensor
+    ) -> torch.Tensor:
         # Concatenate base vectors and apply mean activation.
         delta_factor = torch.tensor(
             [self.delta_factor.xy, self.delta_factor.xy, self.delta_factor.z],
@@ -180,10 +192,14 @@ class GaussianComposer(nn.Module):
             + base_values.mean_inverse_z_ndc.repeat(target_shape) * mean_z_mask
         )
 
-        mean_vectors = self._mean_activation(mean_vectors_ndc, delta_factor * delta[:, :3])
+        mean_vectors = self._mean_activation(
+            mean_vectors_ndc, delta_factor * delta[:, :3]
+        )
         return mean_vectors
 
-    def _mean_activation(self, base: torch.Tensor, learned_delta: torch.Tensor) -> torch.Tensor:
+    def _mean_activation(
+        self, base: torch.Tensor, learned_delta: torch.Tensor
+    ) -> torch.Tensor:
         """Mean activation function.
 
         Args:
@@ -227,7 +243,9 @@ class GaussianComposer(nn.Module):
         # No need to normalize the quaternions, since this is also done in rendering.
         return base + self.delta_factor.quaternion * learned_delta
 
-    def _color_activation(self, base: torch.Tensor, learned_delta: torch.Tensor) -> torch.Tensor:
+    def _color_activation(
+        self, base: torch.Tensor, learned_delta: torch.Tensor
+    ) -> torch.Tensor:
         # For certain activation functions we need to clamp the base value to
         # a supported range.
         if self.color_activation_type == "sigmoid":
@@ -244,7 +262,9 @@ class GaussianComposer(nn.Module):
             colors = sRGB2linearRGB(colors)
         return colors
 
-    def _opacity_activation(self, base: torch.Tensor, learned_delta: torch.Tensor) -> torch.Tensor:
+    def _opacity_activation(
+        self, base: torch.Tensor, learned_delta: torch.Tensor
+    ) -> torch.Tensor:
         activation = math_utils.create_activation_pair(self.opacity_activation_type)
         return activation.forward(
             activation.inverse(base) + self.delta_factor.opacity * learned_delta

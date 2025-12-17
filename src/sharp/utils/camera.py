@@ -66,7 +66,9 @@ def compute_max_offset(
     max_lateral_offset_m = params.max_disparity * diagonal * min_depth
 
     max_medial_offset_m = params.max_zoom * min_depth
-    max_offset_xyz_m = np.array([max_lateral_offset_m, max_lateral_offset_m, max_medial_offset_m])
+    max_offset_xyz_m = np.array(
+        [max_lateral_offset_m, max_lateral_offset_m, max_medial_offset_m]
+    )
 
     return max_offset_xyz_m
 
@@ -347,7 +349,9 @@ class PinholeCameraModel:
     def set_screen_extrinsics(self, new_value: torch.Tensor) -> None:
         """Modify the default extrinsics."""
         self.screen_extrinsics = new_value
-        self.depth_quantiles = _compute_depth_quantiles(self._scene_points, self.screen_extrinsics)
+        self.depth_quantiles = _compute_depth_quantiles(
+            self._scene_points, self.screen_extrinsics
+        )
 
 
 def get_screen_resolution_px_from_input(width: int, height: int) -> tuple[int, int]:

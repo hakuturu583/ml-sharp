@@ -15,7 +15,9 @@ NormLayerName = Literal["noop", "batch_norm", "group_norm", "instance_norm"]
 UpsamplingMode = Literal["transposed_conv", "nearest", "bilinear"]
 
 
-def norm_layer_2d(num_features: int, norm_type: NormLayerName, num_groups: int = 8) -> nn.Module:
+def norm_layer_2d(
+    num_features: int, norm_type: NormLayerName, num_groups: int = 8
+) -> nn.Module:
     """Create normalization layer."""
     if norm_type == "noop":
         return nn.Identity()
@@ -29,7 +31,9 @@ def norm_layer_2d(num_features: int, norm_type: NormLayerName, num_groups: int =
         raise ValueError(f"Invalid normalization layer type: {norm_type}")
 
 
-def upsampling_layer(upsampling_mode: UpsamplingMode, scale_factor: int, dim_in: int) -> nn.Module:
+def upsampling_layer(
+    upsampling_mode: UpsamplingMode, scale_factor: int, dim_in: int
+) -> nn.Module:
     """Create upsampling layer."""
     if upsampling_mode == "transposed_conv":
         return nn.ConvTranspose2d(
@@ -154,7 +158,9 @@ class FeatureFusionBlock2d(nn.Module):
         self.resnet2 = self._residual_block(dim_in, batch_norm)
 
         if upsampling_mode is not None:
-            self.deconv = upsampling_layer(upsampling_mode, scale_factor=2, dim_in=dim_in)
+            self.deconv = upsampling_layer(
+                upsampling_mode, scale_factor=2, dim_in=dim_in
+            )
         else:
             self.deconv = nn.Sequential()
 

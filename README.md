@@ -19,9 +19,23 @@ We recommend to first create a python environment:
 conda create -n sharp python=3.13
 ```
 
-Afterwards, you can install the project using
+Afterwards, you can install the project using one of the following methods:
 
+### Using uv (recommended)
+
+```bash
+uv pip install -e .
 ```
+
+### Using pip
+
+```bash
+pip install -e .
+```
+
+Or install from requirements.txt:
+
+```bash
 pip install -r requirements.txt
 ```
 

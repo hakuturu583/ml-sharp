@@ -176,7 +176,9 @@ class GaussianDensePredictionTransformer(nn.Module):
         dim_in = self.dim_in if use_depth_input else self.dim_in - 1
         image_encoder_params.dim_in = dim_in
         image_encoder_params.dim_out = decoder.dim_out
-        self.image_encoder = self._create_image_encoder(image_encoder_params, stride_out)
+        self.image_encoder = self._create_image_encoder(
+            image_encoder_params, stride_out
+        )
 
         self.fusion = FeatureFusionBlock2d(decoder.dim_out)
 
@@ -191,8 +193,12 @@ class GaussianDensePredictionTransformer(nn.Module):
         else:
             raise ValueError("We only support stride is 1 or 2 for DPT backbone.")
 
-        self.texture_head = self._create_head(dim_decoder=decoder.dim_out, dim_out=self.dim_out)
-        self.geometry_head = self._create_head(dim_decoder=decoder.dim_out, dim_out=self.dim_out)
+        self.texture_head = self._create_head(
+            dim_decoder=decoder.dim_out, dim_out=self.dim_out
+        )
+        self.geometry_head = self._create_head(
+            dim_decoder=decoder.dim_out, dim_out=self.dim_out
+        )
 
     def _create_head(self, dim_decoder: int, dim_out: int) -> nn.Module:
         return nn.Sequential(
@@ -235,9 +241,13 @@ class GaussianDensePredictionTransformer(nn.Module):
                 stride_out=stride_out,
             )
         else:
-            raise ValueError(f"Unsupported image encoder type: {self.image_encoder_type}")
+            raise ValueError(
+                f"Unsupported image encoder type: {self.image_encoder_type}"
+            )
 
-    def forward(self, input_features: torch.Tensor, encodings: list[torch.Tensor]) -> ImageFeatures:
+    def forward(
+        self, input_features: torch.Tensor, encodings: list[torch.Tensor]
+    ) -> ImageFeatures:
         """Run monodepth and fuse features with input image to predict Gaussians.
 
         Args:

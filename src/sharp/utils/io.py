@@ -54,11 +54,15 @@ def load_rgb(
             LOGGER.warning(f"Ignoring image orientation {exif_orientation}.")
 
     # Extract the focal length.
-    f_35mm = img_exif.get("FocalLengthIn35mmFilm", img_exif.get("FocalLenIn35mmFilm", None))
+    f_35mm = img_exif.get(
+        "FocalLengthIn35mmFilm", img_exif.get("FocalLenIn35mmFilm", None)
+    )
     if f_35mm is None or f_35mm < 1:
         f_35mm = img_exif.get("FocalLength", None)
         if f_35mm is None:
-            LOGGER.warn(f"Did not find focallength in exif data of {path} - Setting to 30mm.")
+            LOGGER.warn(
+                f"Did not find focallength in exif data of {path} - Setting to 30mm."
+            )
             f_35mm = 30.0
         if f_35mm < 10.0:
             LOGGER.info("Found focal length below 10mm, assuming it's not for 35mm.")
@@ -90,13 +94,17 @@ def extract_exif(img_pil: Image.Image) -> dict[str, Any]:
 
     # https://pillow.readthedocs.io/en/stable/_modules/PIL/TiffTags.html# # noqa
     tiff_tags = img_pil.getexif()
-    tiff_dict = {TiffTags.TAGS_V2[k].name: v for k, v in tiff_tags.items() if k in TiffTags.TAGS_V2}
+    tiff_dict = {
+        TiffTags.TAGS_V2[k].name: v
+        for k, v in tiff_tags.items()
+        if k in TiffTags.TAGS_V2
+    }
     return {**exif_dict, **tiff_dict}
 
 
 def convert_focallength(width: float, height: float, f_mm: float = 30) -> float:
     """Converts a focal length given in mm to pixels."""
-    return f_mm * np.sqrt(width**2.0 + height**2.0) / np.sqrt(36**2 + 24**2)
+    return f_mm * np.sqrt(width ** 2.0 + height ** 2.0) / np.sqrt(36 ** 2 + 24 ** 2)
 
 
 def save_image(
@@ -182,7 +190,9 @@ class OutputWriter(Protocol):
 class VideoWriter(OutputWriter):
     """Output writer for video output."""
 
-    def __init__(self, output_path: Path, fps: float = 30.0, render_depth: bool = True) -> None:
+    def __init__(
+        self, output_path: Path, fps: float = 30.0, render_depth: bool = True
+    ) -> None:
         """Initialize VideoWriter."""
         output_path.parent.mkdir(exist_ok=True, parents=True)
         self.output_path = output_path
@@ -190,7 +200,9 @@ class VideoWriter(OutputWriter):
 
         self.max_depth_estimate = None
         if render_depth:
-            self.depth_writer = iio.get_writer(output_path.with_suffix(".depth.mp4"), fps=fps)
+            self.depth_writer = iio.get_writer(
+                output_path.with_suffix(".depth.mp4"), fps=fps
+            )
 
     def add_frame(self, image: torch.Tensor, depth: torch.Tensor) -> None:
         """Add a single frame to output."""
@@ -205,7 +217,9 @@ class VideoWriter(OutputWriter):
                 depth,
                 min(self.max_depth_estimate, METRIC_DEPTH_MAX_CLAMP_METER),  # type: ignore[call-overload]
             )
-            colored_depth_np = colored_depth_pt.squeeze(0).permute(1, 2, 0).cpu().numpy()
+            colored_depth_np = (
+                colored_depth_pt.squeeze(0).permute(1, 2, 0).cpu().numpy()
+            )
             self.depth_writer.append_data(colored_depth_np)
 
     def close(self):

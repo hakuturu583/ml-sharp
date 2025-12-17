@@ -92,7 +92,9 @@ def softclamp(
 
     def normalize(clamp_range: SoftClampRange) -> torch.Tensor:
         value0, value1 = clamp_range
-        return value0 + (value1 - value0) * torch.tanh((tensor - value0) / (value1 - value0))
+        return value0 + (value1 - value0) * torch.tanh(
+            (tensor - value0) / (value1 - value0)
+        )
 
     tensor_clamped = tensor
     if min is not None:
@@ -167,7 +169,9 @@ def clamp_with_pushback(
     return output
 
 
-def hard_sigmoid_with_pushback(x: torch.Tensor, slope: float = 1.0 / 6.0) -> torch.Tensor:
+def hard_sigmoid_with_pushback(
+    x: torch.Tensor, slope: float = 1.0 / 6.0
+) -> torch.Tensor:
     """Apply hard sigmoid with pushback.
 
     For compatibility reasons, we follow the default PyTorch implementation with a

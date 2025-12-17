@@ -59,7 +59,9 @@ class UNetEncoder(BaseEncoder):
             self.output_dims = [width << i for i in range(0, steps + 1)]
         else:
             if len(width) != (steps + 1):
-                raise ValueError("Length of width should match the steps for UNetEncoder.")
+                raise ValueError(
+                    "Length of width should match the steps for UNetEncoder."
+                )
             self.output_dims = width
 
         self.conv_in = nn.Sequential(

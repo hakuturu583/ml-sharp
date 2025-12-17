@@ -220,7 +220,9 @@ def load_ply(path: Path) -> tuple[Gaussians3D, SceneMetaData]:
 
     for prop in properties:
         if prop not in vertices:
-            raise KeyError(f"Incompatible ply file: property {prop} not found in ply elements.")
+            raise KeyError(
+                f"Incompatible ply file: property {prop} not found in ply elements."
+            )
     mean_vectors = np.stack(
         (
             np.asarray(vertices["x"]),
@@ -262,7 +264,9 @@ def load_ply(path: Path) -> tuple[Gaussians3D, SceneMetaData]:
 
     opacity_logits = np.asarray(vertices["opacity"])[..., None]
 
-    supplement_elements = [element for element in plydata.elements if element.name != "vertex"]
+    supplement_elements = [
+        element for element in plydata.elements if element.name != "vertex"
+    ]
     supplement_data: dict[str, Any] = {}
     supplement_keys = ["extrinsic", "intrinsic", "color_space", "image_size"]
 
@@ -289,7 +293,8 @@ def load_ply(path: Path) -> tuple[Gaussians3D, SceneMetaData]:
         else:
             if len(intrinsics_data) != 9:
                 raise ValueError(
-                    "Expect 9 elements in intrinsics, " f"but received {len(intrinsics_data)}."
+                    "Expect 9 elements in intrinsics, "
+                    f"but received {len(intrinsics_data)}."
                 )
             intrinsics_matrix = intrinsics_data.reshape((3, 3))
             focal_length_px = (intrinsics_matrix[0, 0], intrinsics_matrix[1, 1])

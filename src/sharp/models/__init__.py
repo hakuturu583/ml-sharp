@@ -69,7 +69,9 @@ def create_predictor(params: PredictorParams) -> RGBGaussianPredictor:
         prediction_head=prediction_head,
         monodepth_model=monodepth_adaptor,
         gaussian_composer=gaussian_composer,
-        scale_map_estimator=create_alignment(params.depth_alignment, depth_decoder_dim=decoder_dim),
+        scale_map_estimator=create_alignment(
+            params.depth_alignment, depth_decoder_dim=decoder_dim
+        ),
     )
 
 

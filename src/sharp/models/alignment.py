@@ -85,7 +85,9 @@ class LearnedAlignment(nn.Module):
         if steps_decoder < 1:
             raise ValueError(f"{steps_decoder} must be greater or equal to 1.")
         widths = [min(base_width << i, 1024) for i in range(steps + 1)]
-        self.encoder = UNetEncoder(dim_in=dim_in, width=widths, steps=steps, norm_num_groups=4)
+        self.encoder = UNetEncoder(
+            dim_in=dim_in, width=widths, steps=steps, norm_num_groups=4
+        )
         self.decoder = UNetDecoder(
             dim_out=widths[0], width=widths, steps=steps_decoder, norm_num_groups=4
         )

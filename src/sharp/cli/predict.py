@@ -110,13 +110,20 @@ def predict_cli(
     LOGGER.info("Using device %s", device)
 
     if with_rendering and device != "cuda":
-        LOGGER.warning("Can only run rendering with gsplat on CUDA. Rendering is disabled.")
+        LOGGER.warning(
+            "Can only run rendering with gsplat on CUDA. Rendering is disabled."
+        )
         with_rendering = False
 
     # Load or download checkpoint
     if checkpoint_path is None:
-        LOGGER.info("No checkpoint provided. Downloading default model from %s", DEFAULT_MODEL_URL)
-        state_dict = torch.hub.load_state_dict_from_url(DEFAULT_MODEL_URL, progress=True)
+        LOGGER.info(
+            "No checkpoint provided. Downloading default model from %s",
+            DEFAULT_MODEL_URL,
+        )
+        state_dict = torch.hub.load_state_dict_from_url(
+            DEFAULT_MODEL_URL, progress=True
+        )
     else:
         LOGGER.info("Loading checkpoint from %s", checkpoint_path)
         state_dict = torch.load(checkpoint_path, weights_only=True)
@@ -145,13 +152,17 @@ def predict_cli(
         gaussians = predict_image(gaussian_predictor, image, f_px, torch.device(device))
 
         LOGGER.info("Saving 3DGS to %s", output_path)
-        save_ply(gaussians, f_px, (height, width), output_path / f"{image_path.stem}.ply")
+        save_ply(
+            gaussians, f_px, (height, width), output_path / f"{image_path.stem}.ply"
+        )
 
         if with_rendering:
             output_video_path = (output_path / image_path.stem).with_suffix(".mp4")
             LOGGER.info("Rendering trajectory to %s", output_video_path)
 
-            metadata = SceneMetaData(intrinsics[0, 0].item(), (width, height), "linearRGB")
+            metadata = SceneMetaData(
+                intrinsics[0, 0].item(), (width, height), "linearRGB"
+            )
             render_gaussians(gaussians, metadata, output_video_path)
 
 
@@ -166,7 +177,9 @@ def predict_image(
     internal_shape = (1536, 1536)
 
     LOGGER.info("Running preprocessing.")
-    image_pt = torch.from_numpy(image.copy()).float().to(device).permute(2, 0, 1) / 255.0
+    image_pt = (
+        torch.from_numpy(image.copy()).float().to(device).permute(2, 0, 1) / 255.0
+    )
     _, height, width = image_pt.shape
     disparity_factor = torch.tensor([f_px / width]).float().to(device)
 

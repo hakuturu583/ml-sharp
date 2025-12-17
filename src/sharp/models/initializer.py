@@ -113,7 +113,9 @@ class MultiLayerInitializer(nn.Module):
         self.normalize_depth = normalize_depth
         self.feature_input_stop_grad = feature_input_stop_grad
 
-    def prepare_feature_input(self, image: torch.Tensor, depth: torch.Tensor) -> torch.Tensor:
+    def prepare_feature_input(
+        self, image: torch.Tensor, depth: torch.Tensor
+    ) -> torch.Tensor:
         """Prepare the feature input to the Guassian predictor."""
         if self.feature_input_stop_grad:
             image = image.detach()
@@ -151,7 +153,9 @@ class MultiLayerInitializer(nn.Module):
 
         def _create_disparity_layers(num_layers: int = 1) -> torch.Tensor:
             """Create multiple disparity layers."""
-            disparity = torch.linspace(1.0 / self.base_depth, 0.0, num_layers + 1, device=device)
+            disparity = torch.linspace(
+                1.0 / self.base_depth, 0.0, num_layers + 1, device=device
+            )
             return disparity[None, None, :-1, None, None].repeat(
                 batch_size, 1, 1, base_height, base_width
             )
@@ -183,7 +187,9 @@ class MultiLayerInitializer(nn.Module):
         elif self.first_layer_depth_option in ("base_depth", "linear_disparity"):
             first_disparity = _create_disparity_layers()
         else:
-            raise ValueError(f"Unknown depth init option: {self.first_layer_depth_option}.")
+            raise ValueError(
+                f"Unknown depth init option: {self.first_layer_depth_option}."
+            )
 
         if self.num_layers == 1:
             disparity = first_disparity
@@ -201,13 +207,17 @@ class MultiLayerInitializer(nn.Module):
             elif self.rest_layer_depth_option == "linear_disparity":
                 following_disparity = _create_disparity_layers(self.num_layers - 1)
             else:
-                raise ValueError(f"Unknown depth init option: {self.rest_layer_depth_option}.")
+                raise ValueError(
+                    f"Unknown depth init option: {self.rest_layer_depth_option}."
+                )
 
             disparity = torch.cat([first_disparity, following_disparity], dim=2)
 
         # Prepare base values.
         base_x_ndc, base_y_ndc = _create_base_xy(depth, self.stride, self.num_layers)
-        disparity_scale_factor = 2 * self.scale_factor * self.stride / float(image_width)
+        disparity_scale_factor = (
+            2 * self.scale_factor * self.stride / float(image_width)
+        )
         base_scales = _create_base_scale(disparity, disparity_scale_factor)
 
         base_quaternions = torch.tensor([1.0, 0.0, 0.0, 0.0], device=device)
@@ -228,7 +238,9 @@ class MultiLayerInitializer(nn.Module):
         if self.color_option == "none":
             pass
         elif self.color_option == "first_layer":
-            base_colors[:, :, 0] = torch.nn.functional.avg_pool2d(image, self.stride, self.stride)
+            base_colors[:, :, 0] = torch.nn.functional.avg_pool2d(
+                image, self.stride, self.stride
+            )
         elif self.color_option == "all_layers":
             temp = torch.nn.functional.avg_pool2d(image, self.stride, self.stride)
             base_colors = temp[:, :, None, :, :].repeat(1, 1, self.num_layers, 1, 1)
@@ -271,7 +283,9 @@ def _create_base_xy(
     return base_x_ndc, base_y_ndc
 
 
-def _create_base_scale(disparity: torch.Tensor, disparity_scale_factor: float) -> torch.Tensor:
+def _create_base_scale(
+    disparity: torch.Tensor, disparity_scale_factor: float
+) -> torch.Tensor:
     """Create base scale for the gaussians."""
     inverse_disparity = torch.ones_like(disparity) / disparity
     base_scales = inverse_disparity * disparity_scale_factor

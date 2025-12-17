@@ -87,8 +87,8 @@ def render_gaussians(
 
     intrinsics = torch.tensor(
         [
-            [f_px, 0, (width - 1) / 2., 0],
-            [0, f_px, (height - 1) / 2., 0],
+            [f_px, 0, (width - 1) / 2.0, 0],
+            [0, f_px, (height - 1) / 2.0, 0],
             [0, 0, 1, 0],
             [0, 0, 0, 1],
         ],
@@ -114,7 +114,9 @@ def render_gaussians(
             image_width=camera_info.width,
             image_height=camera_info.height,
         )
-        color = (rendering_output.color[0].permute(1, 2, 0) * 255.0).to(dtype=torch.uint8)
+        color = (rendering_output.color[0].permute(1, 2, 0) * 255.0).to(
+            dtype=torch.uint8
+        )
         depth = rendering_output.depth[0]
         video_writer.add_frame(color, depth)
     video_writer.close()

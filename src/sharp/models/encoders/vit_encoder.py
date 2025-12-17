@@ -54,10 +54,14 @@ class TimmViT(timm.models.VisionTransformer):
             embeddings = embeddings[:, self.num_prefix_tokens :, :]
 
         # Shape: (batch, height, width, dim) -> (batch, dim, height, width)
-        embeddings = embeddings.reshape(batch_size, height, width, channel).permute(0, 3, 1, 2)
+        embeddings = embeddings.reshape(batch_size, height, width, channel).permute(
+            0, 3, 1, 2
+        )
         return embeddings
 
-    def forward(self, input_tensor: torch.Tensor) -> tuple[torch.Tensor, dict[int, torch.Tensor]]:
+    def forward(
+        self, input_tensor: torch.Tensor
+    ) -> tuple[torch.Tensor, dict[int, torch.Tensor]]:
         """Override forwarding with intermediate features.
 
         Adapted from timm ViT.
@@ -76,7 +80,10 @@ class TimmViT(timm.models.VisionTransformer):
 
         for idx, block in enumerate(self.blocks):
             x = block(x)
-            if self.intermediate_features_ids is not None and idx in self.intermediate_features_ids:
+            if (
+                self.intermediate_features_ids is not None
+                and idx in self.intermediate_features_ids
+            ):
                 intermediate_features[idx] = x
         x = self.norm(x)
 

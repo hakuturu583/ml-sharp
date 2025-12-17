@@ -38,7 +38,9 @@ def colorize_depth(depth: torch.Tensor, val_max: float = 10.0) -> torch.Tensor:
 
 def colorize_alpha(alpha: torch.Tensor) -> torch.Tensor:
     """Colorize alpha map."""
-    return colorize_scalar_map(alpha.squeeze(-3), val_min=0.0, val_max=1.0, color_map="coolwarm")
+    return colorize_scalar_map(
+        alpha.squeeze(-3), val_min=0.0, val_max=1.0, color_map="coolwarm"
+    )
 
 
 def colorize_scalar_map(

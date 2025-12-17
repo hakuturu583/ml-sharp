@@ -68,13 +68,18 @@ class ProjectionModule(nn.Module):
         if len(dims_in) != len(dims_out):
             raise ValueError("Length of dims_in must be same as length of dims_out.")
         self.convs = nn.ModuleList(
-            [nn.Conv2d(dim_in, dim_out, 1) for dim_in, dim_out in zip(dims_in, dims_out)]
+            [
+                nn.Conv2d(dim_in, dim_out, 1)
+                for dim_in, dim_out in zip(dims_in, dims_out)
+            ]
         )
 
     def forward(self, encodings: list[torch.Tensor]) -> list[torch.Tensor]:
         """Apply projection module."""
         if len(encodings) != len(self.convs):
-            raise ValueError("Number of encodings must be equal to number of projections.")
+            raise ValueError(
+                "Number of encodings must be equal to number of projections."
+            )
         return [conv(encoding) for conv, encoding in zip(self.convs, encodings)]
 
 

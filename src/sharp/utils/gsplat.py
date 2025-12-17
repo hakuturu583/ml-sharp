@@ -133,7 +133,9 @@ class GSplatRenderer(nn.Module):
             cov2d[~splats_visible_mask][..., 0, 1] = 0
 
             # Normalize the depth by alpha.
-            rendered_depth = rendered_depth_unnormalized / torch.clip(rendered_alpha, min=1e-8)
+            rendered_depth = rendered_depth_unnormalized / torch.clip(
+                rendered_alpha, min=1e-8
+            )
 
             outputs = RenderingOutputs(
                 color=rendered_color,
@@ -179,7 +181,7 @@ class GSplatRenderer(nn.Module):
         b = conics[..., 1]
         c = conics[..., 2]
         # Reconstruct determinant.
-        det = 1 / (a * c - b**2 + eps)
+        det = 1 / (a * c - b ** 2 + eps)
         det = det.clamp(min=eps)
         # Reconstruct covars2d.
         covars2d = torch.zeros(*conics.shape[:-1], 2, 2, device=conics.device)
